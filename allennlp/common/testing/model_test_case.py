@@ -11,6 +11,7 @@ from numpy.testing import assert_allclose
 from allennlp.commands.train import train_model_from_file
 from allennlp.common import Params
 from allennlp.common.testing.test_case import AllenNlpTestCase
+from allennlp.common.util import int_to_device
 from allennlp.data import DatasetReader, Vocabulary
 from allennlp.data import DataLoader
 from allennlp.data.batch import Batch
@@ -163,7 +164,8 @@ class ModelTestCase(AllenNlpTestCase):
             params=data_loader_params, reader=reader, data_path=params["validation_data_path"]
         )
         data_loader.index_with(model.vocab)
-
+        data_loader.set_target_device(int_to_device(cuda_device))
+        
         if seed is not None:
             random.seed(seed)
             numpy.random.seed(seed)
@@ -174,7 +176,8 @@ class ModelTestCase(AllenNlpTestCase):
             params=data_loader_params2, reader=reader, data_path=params["validation_data_path"]
         )
         data_loader2.index_with(loaded_model.vocab)
-
+        data_loader2.set_target_device(int_to_device(cuda_device))
+        
         # We'll check that even if we index the dataset with each model separately, we still get
         # the same result out.
         model_batch = next(iter(data_loader))
